@@ -1,26 +1,33 @@
 #include "set.cpp"
 
 int main() {
-    int* m = new int[8] {2, 2, 3, 4, 5, 1, 3, 3};
-    Set<int> a(m, 6);
+    setlocale(LC_ALL, "Russian");
+    string* m = new string[3] {"asd","fghj","kl"};
+    Set<string> a(m, 3);
     cout << a;
 
-    int* m1 = new int[3] {1, 2, 3};
-    Set<int>b(m1, 3);
+    string* m1 = new string[5] {"xc","zvb","asg","dfg","xcv"};
+    Set<string>b(m1, 5);
+    cout << a+b;
 
-    int* m2 = new int[4] {4, 3, 6, 1};
-    Set<int> c(m2, 4);
-
-    cout << b + c;
-
+    SetPair ar(2,3.3);
+    cout << ar;
+   // Set<SetPair> arsen(ar);
+   // cout <<"Я тут" << arsen;
     cout << Set<int>(5);
 
-    int* m4 = new int[3] {1, 2, 3};
-    Set<int>e(m4, 3);
-
-    int* m5 = new int[4] {4, 3, 6, 1};
+    int* m4 = new int[6] {1, 2, 3, 4, 5, 6};
+    Set<int>e(m4, 6);
+    cout << e + 10;
+    int* m5 = new int[4] {4, 7, 6, 8};
     Set<int> f(m5, 4);
-    cout << e * f;
-    cout << e.num_in_set(3);
+
+    //задача
+    int* massi1 = new int[4] {9, 2, 6, 4};
+    int* massi2 = new int[10] {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};
+    Set<int>set1(massi1, 4);
+    Set<int>set2(massi2, 10);
+    f= checkArrays(set1, set2);
+    cout << f;
     return 0;
 }

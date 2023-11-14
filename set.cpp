@@ -6,8 +6,18 @@
 #include <random>
 #include <limits>
 #include <iostream>
+#include <utility>
 
 
+
+using namespace std;
+template <typename T1, typename T2>
+std::ostream& operator<<(std::ostream& os, const std::pair<T1, T2>& p)
+{
+    os << "[" << p.first << ", " << p.second << "]";
+    return os;
+}
+ 
 template<typename T>
 std::uniform_int_distribution<T> getDice(std::true_type)
 {
@@ -31,32 +41,6 @@ T random()
     return dice(generator);
 }
 
-
-using namespace std;
-
-class SetPair {
-private:
-    int* _val1;
-    double* _val2;
-public:
-    SetPair() :_val1(nullptr), _val2(nullptr) {};
-    SetPair(int val1, double val2) : _val1(new int(val1)), _val2(new double(val2)) {};
-    ~SetPair() {
-        delete _val1;
-        delete _val2;
-    }
-    SetPair(const SetPair& p) {
-        _val1 = new int(*p._val1);
-        _val2 = new double(*p._val2);
-    }
-    friend std::ostream& operator<<(std::ostream& out, const SetPair& s) {            //оператор вывода
-        cout << *s._val1 << ", "<<*s._val2;
-        cout << endl;
-        return out;
-    }
-};
-
-
 template<typename T>
 class Set {
 private:
@@ -67,7 +51,22 @@ public:
         _elements = nullptr;
         _len = 0;
     }
+    Set(Set<T>& other) {                                                       //конструктор копирования
+        Set<T> a;
+        for (int i = 0;i < other._len;i++) {
+            a += other[i];
+        }
+        swap(a);
+    }
 
+    void swap(Set& other) {
+        std::swap(_elements, other._elements);
+        std::swap(_len, other._len);
+    }
+
+    int get_len() {
+        return _len;
+    }
 
     Set(const T* values, int l) {                                             // конструктор со значениями
         _len = 0;
@@ -128,38 +127,40 @@ public:
 
     
     void operator +=(T other) {                                                    // добавление числа во множество +=
-        for (int i = 0; i < _len; i++) {
-            if (_elements[i] == other) {
-                return;
+        if (!num_in_set(other)) {
+            T* mas = new T[_len + 1];
+            for (int i = 0; i < _len; i++) {
+                mas[i] = _elements[i];
             }
+            mas[_len] = other;
+            delete[] _elements;
+            _elements = mas;
+            _len++;
         }
-        T* mas = new T[_len + 1];
-        for (int i = 0; i < _len; i++) {
-            mas[i] = _elements[i];
-        }
-        mas[_len] = other;
-        delete[] _elements;
-        _elements = mas;
-        _len++;
     }
 
 
-    friend Set<T> operator-(const Set<T>& first, T other) {                         // удаление числа из множества -
+    friend Set<T> operator-( Set<T>& first, T other) {                         // удаление числа из множества -
         Set<T> sec = first;
         sec -= other;
         return sec;
     }
 
 
-    void operator-=( T other) {                                                     // удаление числа из множества -=
-        for (int i = 0; i < _len; i++) {
-            if (_elements[i] == other) {
-                for (int j = i; j < _len - 1; j++) {
-                     _elements[j] = _elements[j + 1];
+  
+    void operator -=(T other) {                                                    //  удаление числа из множества -=
+        if (num_in_set(other)) {
+            T* mas = new T[_len - 1];
+            int j = 0;
+            for (int i = 0; i < _len; i++) {
+                if (_elements[i] != other) {
+                    mas[j] = _elements[i];
+                    j++;
                 }
-            _len--;
-             break;
             }
+            delete[] _elements;
+            _elements = mas;
+            _len--;
         }
     }
 
@@ -179,39 +180,36 @@ public:
     }
 
 
-    
-
-
-     Set<T> operator-(const Set<T>& other) {            // оператор вычитания множеств
-        int k=(_len - other._len);
-        T* mas = new T[k];
-        int index = 0;
-        int n = abs(_len - other._len);
-        for (int i = 0; i < _len; i++) {
-            bool found = false;
-            for (int j = 0; j < other._len; j++) {
-                if (_elements[i] == other._elements[j]) {
-                    found = true;
-                    break;
-                }
-            }
-            if (!found) {
-                mas[index] = _elements[i];
-                index++;
-            }
+    friend Set<T> operator+(Set<T>& first, Set<T>& other) {           // оператор сложения множеств
+        Set<T>new_set(first);
+        for (int i = 0;i < other._len; i++) {
+            new_set += other[i];
         }
-        return Set<T>(mas, index);
+        return new_set;
+    }
+
+
+
+
+     friend Set<T> operator-(Set<T>& first, Set<T>& other) {            // оператор вычитания множеств
+         Set<T> new_set(first);
+         for (int i = 0; i < other._len; i++) {
+             new_set -= other[i];
+         }
+         return new_set;
+    
      }
 
 
     bool num_in_set(T val) {                                                        // проверка наличия числа в множестве
+        T* temp = _elements;
         for (int i = 0;i < _len;i++) {
-            if (*_elements == val) {
+            if (*temp == val) {
                 return true;
             }
             else
             {
-                _elements++;
+                temp++;
             }
         }
         return false;
@@ -221,23 +219,21 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const Set<T>& s) {            //оператор вывода
         for (int i = 0; i < s._len; i++) {
-            cout << s[i] << ", ";
+            cout << s[i] << "  ";
         }
         cout << endl;
         return out;
     }
 
-
-    friend bool checkArrays(const Set<T>& set1, const Set<T>& set2) {
-        for (int i = 0; i < set1._len; i++) {
-            if (!set2.num_in_set(set1[i])) {
-                return false;
-            }
-        }
+    
+};
+template<typename T>
+bool is_equal(Set<T>& first, Set<T>& other) {                                     //возвращает тру если каждый элемент в зис встречается в озере
+    if ((first + other).get_len() == other.get_len()) {
         return true;
     }
-};
-
+    return false;
+}
 
 
 

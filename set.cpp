@@ -7,7 +7,7 @@
 #include <limits>
 #include <iostream>
 #include <utility>
-
+#define eps 0.01
 
 
 using namespace std;
@@ -92,7 +92,7 @@ public:
         for (int i = 0; i < len; i++) {
             T val;
             while (true) {
-                int flag = true;
+                bool flag = true;
                 val = random<T>();
                 for (int j = 0; j < _len; j++) {
                     if (_elements[j] == val) {
@@ -109,11 +109,11 @@ public:
     }
 
 
-    T operator[](int index) const {                                               //оператор для получения числа по индексу
+    T& operator[](int index) const {                                               //оператор для получения числа по индексу
         if (index < 0 || index >= _len) {
-            throw out_of_range("[T operator[]] Index is out of range.");
+            throw std::out_of_range("Set::operator[], index is out of range");
         }
-        return *(_elements + index);
+        return _elements[index];
     }
 
 
@@ -219,17 +219,27 @@ public:
 
     friend std::ostream& operator<<(std::ostream& out, const Set<T>& s) {            //оператор вывода
         for (int i = 0; i < s._len; i++) {
-            cout << s[i] << "  ";
+            out << s[i] << "  ";
         }
-        cout << endl;
+        out << endl;
         return out;
+    }
+
+    bool operator==(const Set<T>& s) {
+        
+        if (_len != s._len) return false;
+        for (int i = 0; i < _len; i++)
+        {
+            if (abs(_elements[i] - s[i])>=eps) return false;
+        }
+        return true;
     }
 
     
 };
 template<typename T>
-bool is_equal(Set<T>& first, Set<T>& other) {                                     //возвращает тру если каждый элемент в зис встречается в озере
-    if ((first + other).get_len() == other.get_len()) {
+bool is_equal(Set<T>& first, Set<T>& other) {                                     //возвращает true если каждый элемент в first встречается в other
+    if ((first+ other).get_len() == other.get_len()) {
         return true;
     }
     return false;

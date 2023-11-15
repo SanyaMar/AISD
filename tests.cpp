@@ -4,10 +4,17 @@ int main() {
     setlocale(LC_ALL, "Russian");
 
     int* massi1 = new int[10] {1, 2, 3, 4, 5, 6, 6, 6, 9, 10};
-    int* massi2 = new int[5] {1, 2, 3, 4, 5};
+   // int* massi2 = new int[5] {1, 2, 3, 4, 5};
     Set<int>set1(massi1, 10);
     Set<int>set2(10);
     cout << "ints * " << set1 + set2 << endl;
+
+    cout << (set1 == set1)<<endl;
+    cout << (set1 == set2)<<endl;
+
+    cout << set1[1] << endl;
+    set1[1] = 100;
+    cout << set1[1] << endl;
 
     float* massi3 = new float[5] {1.4, 2.3, 3.8, 3.7, 5.4};
     float* massi4 = new float[4] {1.8, 2.3, 3.6, 4.4};
@@ -38,7 +45,7 @@ int main() {
     }
 
 
-    int* massi7 = new int[10] {5, 2, 1, 4, 3, 7, 6, 8, 9, 10};
+    int* massi7 = new int[11] {5, 2, 1, 4, 3, 7, 6, 8, 9, 10,9};
     int* massi8 = new int[5] {1, 2, 3, 4, 5};
     Set<int>set7(massi7, 10);
     Set<int>set8(massi8, 5);
